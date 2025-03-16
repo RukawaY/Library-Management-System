@@ -13,7 +13,8 @@
         <div style="width:30%;margin:0 auto; padding-top:5vh;">
 
             <el-input v-model="this.toQuery" style="display:inline; " placeholder="输入借书证ID"></el-input>
-            <el-button style="margin-left: 10px;" type="primary" @click="QueryBorrows">查询</el-button>
+            <br>
+            <el-button style="align-items: center; margin-top:20px;" type="primary" @click="QueryBorrows">查询</el-button>
 
         </div>
 
