@@ -6,12 +6,7 @@ import com.sun.net.httpserver.*;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
-import Handlers.CardHandler;
-import Handlers.BookHandler;
-import Handlers.BorrowHandler;
-
 public class Main {
-
     private static final Logger log = Logger.getLogger(Main.class.getName());
 
     public static void main(String[] args) throws IOException {
@@ -28,13 +23,16 @@ public class Main {
                 System.exit(1);
             }
 
+            // create library management instance
+            LibraryManagementSystem lib = new LibraryManagementSystemImpl(connector);
+
             // http server
             HttpServer server = HttpServer.create(new InetSocketAddress(8081), 0);
 
             // register handlers
-            server.createContext("/card", new CardHandler(connector));
-            server.createContext("/book", new BookHandler(connector));
-            server.createContext("/borrow", new BorrowHandler(connector));
+            server.createContext("/card", new CardHandler(lib));
+            server.createContext("/book", new BookHandler(lib));
+            server.createContext("/borrow", new BorrowHandler(lib));
 
             // start server
             server.start();

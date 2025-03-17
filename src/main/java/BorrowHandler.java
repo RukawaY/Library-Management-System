@@ -1,21 +1,21 @@
-package Handlers;
-
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import utils.DatabaseConnector;
+
+import queries.ApiResult;
+import queries.BorrowHistories;
+import queries.BorrowHistories.Item;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.InputStream;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+
+import java.util.List;
 
 public class BorrowHandler implements HttpHandler {
 
-    private final DatabaseConnector connector;
+    private final LibraryManagementSystem libsys;
 
-    public BorrowHandler(DatabaseConnector connector) {
-        this.connector = connector;
+    public BorrowHandler(LibraryManagementSystem libsys) {
+        this.libsys = libsys;
     }
 
     @Override
@@ -42,21 +42,44 @@ public class BorrowHandler implements HttpHandler {
         String query = exchange.getRequestURI().getQuery();
         String type = null;
 
+        // query example: ?type=records&cardId=123456
+
+        int cardId = -1;
         if (query != null) {
             for (String param : query.split("&")) {
                 String[] KeyValue = param.split("=");
                 if (KeyValue[0].equals("type")) {
                     type = KeyValue[1];
-                    break;
+                }
+                if (KeyValue[0].equals("cardId")) {
+                    cardId = Integer.parseInt(KeyValue[1]);
                 }
             }
         }
 
-        String response;
+        String response = "{\"error\":\"Not initialized\"}";
         switch (type) {
             case "records":
-                // 调用数据库查询方法
-                response = connector.
+                // 获取借阅记录
+                if (cardId == -1) {
+                    response = "{\"error\":\"Invalid cardId\"}";
+                } else {
+                    ApiResult res = libsys.showBorrowHistory(cardId);
+                    if (res.ok) {
+                        BorrowHistories borrowHistories = (BorrowHistories) res.payload;                       
+                        List<Item> borrowRecords = borrowHistories.getItems();
+                        String records = "[";
+                        for (Item record : borrowRecords) {
+                            records += record.toString() + ", ";
+                        }
+                        records = records.substring(0, records.length() - 2);
+                        records += "]";
+
+                        response = "{\"records\":" + records + "}";
+                    } else {
+                        response = "{\"error\":\"" + res.message + "\"}";
+                    }
+                }
                 break;
             default:
                 response = "{\"error\":\"Invalid type\"}";

@@ -56,12 +56,14 @@ public final class Card {
     }
 
     @Override
+    // modify to output json format
     public String toString() {
-        return "Card {" + "cardId=" + cardId +
-                ", name='" + name + '\'' +
-                ", department='" + department + '\'' +
-                ", type=" + type +
-                '}';
+        return "{" +
+                "\"cardId\":" + cardId +
+                ", \"name\":\"" + name + "\"" +
+                ", \"department\":\"" + department + "\"" +
+                ", \"type\":\"" + type.getStr() + "\"" +
+                "}";
     }
 
     public Card() {

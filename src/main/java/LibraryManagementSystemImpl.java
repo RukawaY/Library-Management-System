@@ -11,12 +11,6 @@ import utils.DatabaseConnector;
 
 import java.sql.*;
 import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
-
-import javax.naming.spi.DirStateFactory.Result;
-
-import com.mysql.cj.protocol.Resultset;
-import com.mysql.cj.x.protobuf.MysqlxPrepare.Prepare;
 
 public class LibraryManagementSystemImpl implements LibraryManagementSystem {
 

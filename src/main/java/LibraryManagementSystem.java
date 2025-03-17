@@ -36,6 +36,7 @@ public interface LibraryManagementSystem {
      *
      * @param book all attributes of the book
      */
+    // POST
     ApiResult storeBook(Book book);
 
     /**
@@ -49,6 +50,7 @@ public interface LibraryManagementSystem {
      * @param bookId book's book_id
      * @param deltaStock increase count to book's stock, must be greater
      */
+    // POST
     ApiResult incBookStock(int bookId, int deltaStock);
 
     /**
@@ -67,6 +69,7 @@ public interface LibraryManagementSystem {
      *
      * @param books list of books to be stored
      */
+    // POST
     ApiResult storeBook(List<Book> books);
 
     /**
@@ -77,6 +80,7 @@ public interface LibraryManagementSystem {
      *
      * @param bookId the book to be removed
      */
+    // POST
     ApiResult removeBook(int bookId);
 
     /**
@@ -86,6 +90,7 @@ public interface LibraryManagementSystem {
      *
      * @param book the book to be modified
      */
+    // POST
     ApiResult modifyBookInfo(Book book);
 
     /**
@@ -105,6 +110,7 @@ public interface LibraryManagementSystem {
      * @return query results should be returned by ApiResult.payload
      *         and should be an instance of {@link queries.BookQueryResults}
      */
+    // GET
     ApiResult queryBook(BookQueryConditions conditions);
 
     /* Interface for borrow & return books */
@@ -118,6 +124,7 @@ public interface LibraryManagementSystem {
      * @param borrow borrow information, include borrower &
      *               book's id & time
      */
+    // POST
     ApiResult borrowBook(Borrow borrow);
 
     /**
@@ -125,6 +132,7 @@ public interface LibraryManagementSystem {
      *
      * @param borrow borrow information, include borrower & book's id & return time
      */
+    // POST
     ApiResult returnBook(Borrow borrow);
 
     /**
@@ -135,6 +143,7 @@ public interface LibraryManagementSystem {
      * @return query results should be returned by ApiResult.payload
      *         and should be an instance of {@link queries.BorrowHistories}
      */
+    // GET
     ApiResult showBorrowHistory(int cardId);
 
     /**
@@ -146,6 +155,7 @@ public interface LibraryManagementSystem {
      *
      * @param card all attributes of the card
      */
+    // POST 
     ApiResult registerCard(Card card);
 
     /**
@@ -156,6 +166,7 @@ public interface LibraryManagementSystem {
      *
      * @param cardId card to be removed
      */
+    // POST
     ApiResult removeCard(int cardId);
 
     /**
@@ -164,6 +175,7 @@ public interface LibraryManagementSystem {
      * @return query results should be returned by ApiResult.payload
      *         and should be an instance of {@link queries.CardList}
      */
+    // GET
     ApiResult showCards();
 
     /**

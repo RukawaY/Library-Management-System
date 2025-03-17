@@ -36,18 +36,20 @@ public class BorrowHistories {
         }
 
         @Override
+        // modify to json format
         public String toString() {
-            return "Item {" + "cardId=" + cardId +
-                    ", bookId=" + bookId +
-                    ", category='" + category + '\'' +
-                    ", title='" + title + '\'' +
-                    ", press='" + press + '\'' +
-                    ", publishYear=" + publishYear +
-                    ", author='" + author + '\'' +
-                    ", price=" + price +
-                    ", borrowTime=" + borrowTime +
-                    ", returnTime=" + returnTime +
-                    '}';
+            return "{" +
+                    "\"cardId\":" + cardId +
+                    ", \"bookId\":" + bookId +
+                    ", \"category\":\"" + category + "\"" +
+                    ", \"title\":\"" + title + "\"" +
+                    ", \"press\":\"" + press + "\"" +
+                    ", \"publishYear\":" + publishYear +
+                    ", \"author\":\"" + author + "\"" +
+                    ", \"price\":" + price +
+                    ", \"borrowTime\":" + borrowTime +
+                    ", \"returnTime\":" + returnTime +
+                    "}";
         }
 
         public int getCardId() {

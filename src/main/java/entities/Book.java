@@ -67,16 +67,18 @@ public final class Book {
     }
 
     @Override
+    // modify to json format
     public String toString() {
-        return "Book {" + "bookId=" + bookId +
-                ", category='" + category + '\'' +
-                ", title='" + title + '\'' +
-                ", press='" + press + '\'' +
-                ", publishYear=" + publishYear +
-                ", author='" + author + '\'' +
-                ", price=" + String.format("%.2f", price) +
-                ", stock=" + stock +
-                '}';
+        return "{" +
+                "\"bookId\":" + bookId +
+                ",\"category\":\"" + category + "\"" +
+                ",\"title\":\"" + title + "\"" +
+                ",\"press\":\"" + press + "\"" +
+                ",\"publishYear\":" + publishYear +
+                ",\"author\":\"" + author + "\"" +
+                ",\"price\":" + String.format("%.2f", price) +
+                ",\"stock\":" + stock +
+                "}";
     }
 
     /* we assume that two books are equal iff their category...author are equal */
