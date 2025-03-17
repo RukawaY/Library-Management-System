@@ -2,23 +2,17 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
-import entities.Card;
 import entities.Book;
 import entities.Borrow;
 import entities.Book.SortColumn;
 import jsonHandlers.*;
 import queries.SortOrder;
 import queries.ApiResult;
-import queries.CardList;
 import queries.BookQueryConditions;
 import queries.BookQueryResults;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import java.io.IOException;
 import java.io.OutputStream;
-import java.security.Key;
 import java.util.List;
 import java.io.InputStream;
 import java.io.BufferedReader;
