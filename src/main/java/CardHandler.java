@@ -6,6 +6,7 @@ import queries.ApiResult;
 import queries.CardList;
 
 import entities.Card;
+import entities.Card.CardType;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -116,7 +117,13 @@ public class CardHandler implements HttpHandler {
         ApiResult res = null;
         switch (action) {
             case "register":
-                Card card = gson.fromJson(request, CardJson.class).getCard();
+                int cardId = gson.fromJson(request, CardJson.class).getCardId();
+                String name = gson.fromJson(request, CardJson.class).getName();
+                String department = gson.fromJson(request, CardJson.class).getDepartment();
+                String type = gson.fromJson(request, CardJson.class).getType();
+                CardType cardType = CardType.values(type);
+                Card card = new Card(cardId, name, department, cardType);
+
                 res = libsys.registerCard(card);
                 if (res.ok) {
                     message = "Register card success";
@@ -125,12 +132,27 @@ public class CardHandler implements HttpHandler {
                 }
                 break;
             case "remove":
-                int cardId = gson.fromJson(request, CardIDJson.class).getCardID();
-                res = libsys.removeCard(cardId);
+                int cardId3 = gson.fromJson(request, CardIDJson.class).getCardID();
+                res = libsys.removeCard(cardId3);
                 if (res.ok) {
                     message = "Remove card success";
                 } else {
                     message = "Remove card failed: " + res.message;
+                }
+                break;
+            case "modify":
+                int cardId2 = gson.fromJson(request, CardJson.class).getCardId();
+                String name2 = gson.fromJson(request, CardJson.class).getName();
+                String department2 = gson.fromJson(request, CardJson.class).getDepartment();
+                String type2 = gson.fromJson(request, CardJson.class).getType();
+                CardType cardType2 = CardType.values(type2);
+                Card card2 = new Card(cardId2, name2, department2, cardType2);
+
+                res = libsys.modifyCardInfo(card2);
+                if (res.ok) {
+                    message = "Modify card success";
+                } else {
+                    message = "Modify card failed: " + res.message;
                 }
                 break;
             default:

@@ -179,6 +179,14 @@ public interface LibraryManagementSystem {
     ApiResult showCards();
 
     /**
+     * modify a card's information by card_id.
+     * @param card
+     * @return
+     */
+    // GET
+    ApiResult modifyCardInfo(Card card);
+
+    /**
      * reset database to its initial state.
      * you are not allowed to complete & modify this function.
      */

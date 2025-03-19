@@ -87,7 +87,7 @@ public class BorrowHandler implements HttpHandler {
         }
         
         // 设置响应头
-        exchange.getResponseHeaders().set("Content-Type", "application/json");
+        exchange.getResponseHeaders().set("Content-Type", "application/json;charset=utf-8");
         exchange.sendResponseHeaders(200, 0);
 
         OutputStream outputStream = exchange.getResponseBody();

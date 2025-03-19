@@ -39,14 +39,8 @@ public class BorrowHistories {
         // modify to json format
         public String toString() {
             return "{" +
-                    "\"cardId\":" + cardId +
-                    ", \"bookId\":" + bookId +
-                    ", \"category\":\"" + category + "\"" +
-                    ", \"title\":\"" + title + "\"" +
-                    ", \"press\":\"" + press + "\"" +
-                    ", \"publishYear\":" + publishYear +
-                    ", \"author\":\"" + author + "\"" +
-                    ", \"price\":" + price +
+                    "\"cardID\":" + cardId +
+                    ", \"bookID\":" + bookId +
                     ", \"borrowTime\":" + borrowTime +
                     ", \"returnTime\":" + returnTime +
                     "}";

@@ -27,7 +27,7 @@ public class Main {
             LibraryManagementSystem lib = new LibraryManagementSystemImpl(connector);
 
             // http server
-            HttpServer server = HttpServer.create(new InetSocketAddress(8081), 0);
+            HttpServer server = HttpServer.create(new InetSocketAddress(3306), 0);
 
             // register handlers
             server.createContext("/card", new CardHandler(lib));
@@ -36,7 +36,7 @@ public class Main {
 
             // start server
             server.start();
-            log.info("Server started on port 8081");
+            log.info("Server started on port 3306.");
 
             // add shutdown hook
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {

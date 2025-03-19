@@ -12,7 +12,7 @@
         <!-- 查询框 -->
         <div style="width:30%;margin:0 auto; padding-top:5vh;">
 
-            <el-input v-model="this.toQuery" style="display:inline; " placeholder="输入借书证ID"></el-input>
+            <el-input v-model="this.cardID" style="display:inline; " placeholder="输入借书证ID"></el-input>
             <br>
             <el-button style="align-items: center; margin-top:20px;" type="primary" @click="QueryBorrows">查询</el-button>
 
@@ -34,6 +34,7 @@
 <script>
 import axios from 'axios';
 import { Search } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus';
 
 export default {
     data() {
@@ -45,9 +46,10 @@ export default {
                 borrowTime: "2024.03.04 21:48",
                 returnTime: "2024.03.04 21:49"
             }],
-            toQuery: '', // 待查询内容(对某一借书证号进行查询)
+            type: '',
+            cardID: '', // 待查询内容(对某一借书证号进行查询)
             toSearch: '', // 待搜索内容(对查询到的结果进行搜索)
-            Search
+            Search,
         }
     },
     computed: {
@@ -64,12 +66,23 @@ export default {
     methods: {
         async QueryBorrows() {
             this.tableData = [] // 清空列表
-            let response = await axios.get('/borrow', { params: { cardID: this.toQuery } }) // 向/borrow发出GET请求，参数为cardID=this.toQuery
-            let borrows = response.data // 获取响应负载
-            borrows.forEach(borrow => { // 对于每一个借书记录
-                this.tableData.push(borrow) // 将它加入到列表项中
-            });
-            this.isShow = true // 显示结果列表
+
+            let response = axios.get('./borrow?type=records&cardId='+this.cardID.toString())
+               .then(response => {
+                    if (response.data.error) {
+                        ElMessage.error(response.data.error);
+                    } else {
+                        console.log('Borrow records: ', response.data.records);
+                        let borrows = response.data.records // 获取响应负载
+                        borrows.forEach(borrow => { // 对于每一个借书记录
+                            this.tableData.push(borrow) // 将它加入到列表项中
+                        });
+                        this.isShow = true // 显示结果列表
+                    }
+               })
+               .catch(error => {
+                    console.error('Error: ', error);
+               });
         }
     }
 }

@@ -144,6 +144,7 @@ export default {
             Delete,
             Edit,
             Search,
+            action: '', // 借书证操作类型
             toSearch: '', // 搜索内容
             types: [ // 借书证类型
                 {
@@ -174,33 +175,88 @@ export default {
     },
     methods: {
         ConfirmNewCard() {
-            // 发出POST请求
+            let tempType = '';
+            if (this.newCardInfo.type === '教师') {
+                tempType = 'T'
+            } else {
+                tempType = 'S'
+            }
             axios.post("/card",
                 { // 请求体
-                    name: this.newCardInfo.name,
-                    department: this.newCardInfo.department,
-                    type: this.newCardInfo.type
+                    action: "register",
+                    card: {
+                        cardId: 0,
+                        name: this.newCardInfo.name,
+                        department: this.newCardInfo.department,
+                        type: tempType
+                    }
                 })
                 .then(response => {
-                    ElMessage.success("借书证新建成功") // 显示消息提醒
-                    this.newCardVisible = false // 将对话框设置为不可见
-                    this.QueryCards() // 重新查询借书证以刷新页面
+                    if (response.data.error) {
+                        ElMessage.error(response.data.error) // 显示错误消息
+                    } else {
+                        ElMessage.success("借书证新建成功") // 显示消息提醒
+                        this.newCardVisible = false // 将对话框设置为不可见
+                        this.QueryCards() // 重新查询借书证以刷新页面
+                    }
                 })
         },
         ConfirmModifyCard() {
-            // TODO: YOUR CODE HERE
+            let tempType = '';
+            if (this.toModifyInfo.type === '教师') {
+                tempType = 'T'
+            } else {
+                tempType = 'S'
+            }
+            axios.post("/card",
+                {
+                    action: "modify",
+                    card: {
+                        cardId: this.toModifyInfo.id,
+                        name: this.toModifyInfo.name,
+                        department: this.toModifyInfo.department,
+                        type: tempType
+                    }
+                })
+                .then(response => {
+                    if (response.data.error) {
+                        ElMessage.error(response.data.error) // 显示错误消息
+                    } else {
+                        ElMessage.success("借书证信息修改成功")
+                        this.modifyCardVisible = false
+                        this.QueryCards()
+                    }
+                })          
         },
         ConfirmRemoveCard() {
-            // TODO: YOUR CODE HERE
+            axios.post("/card",
+                {
+                    action: "remove",
+                    cardId: this.toRemove
+                })
+                .then(response => {
+                    if (response.data.error) {
+                        ElMessage.error(response.data.error) // 显示错误消息
+                    } else {
+                        ElMessage.success("借书证删除成功")
+                        this.removeCardVisible = false
+                        this.QueryCards()
+                    }
+                })
         },
         QueryCards() {
             this.cards = [] // 清空列表
-            let response = axios.get('/card') // 向/card发出GET请求
+            let response = axios.get('/card?type=records') // 向/card发出GET请求
                 .then(response => {
-                    let cards = response.data // 接收响应负载
-                    cards.forEach(card => { // 对于每个借书证
-                        this.cards.push(card) // 将其加入到列表中
-                    })
+                    if (response.data.error) {
+                        ElMessage.error(response.data.error) // 显示错误消息
+                    } else {
+                        let cards = response.data.records // 接收响应负载
+                        console.log(response.data)
+                        cards.forEach(card => { // 对于每个借书证
+                            this.cards.push(card) // 将其加入到列表中
+                        })
+                    }
                 })
         }
     },
