@@ -34,7 +34,7 @@ public class LibraryManagementSystemImpl implements LibraryManagementSystem {
             stmt.setString(5, book.getAuthor());
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return new ApiResult(false, "Book already exists!");
+                return new ApiResult(false, "书库中已存在此书!");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -78,7 +78,7 @@ public class LibraryManagementSystemImpl implements LibraryManagementSystem {
             stmt.setInt(1, bookId);
             ResultSet rs = stmt.executeQuery();
             if (!rs.next()) {
-                return new ApiResult(false, "Book does not exist!");
+                return new ApiResult(false, "图书不存在!");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -94,7 +94,7 @@ public class LibraryManagementSystemImpl implements LibraryManagementSystem {
             if (rs.next()) {
                 int stock = rs.getInt(1);
                 if (stock + deltaStock < 0) {
-                    return new ApiResult(false, "Book stock cannot be negative!");
+                    return new ApiResult(false, "图书库存不能为负值!");
                 }
             }
 
@@ -125,7 +125,7 @@ public class LibraryManagementSystemImpl implements LibraryManagementSystem {
                 stmt.setString(5, book.getAuthor());
                 ResultSet rs = stmt.executeQuery();
                 if (rs.next()) {
-                    return new ApiResult(false, "Book already exists!");
+                    return new ApiResult(false, "书库中已存在此书!");
                 }
             }
         } catch (Exception e) {
@@ -176,7 +176,7 @@ public class LibraryManagementSystemImpl implements LibraryManagementSystem {
             stmt.setInt(1, bookId);
             ResultSet rs = stmt.executeQuery();
             if (!rs.next()) {
-                return new ApiResult(false, "Book does not exist!");
+                return new ApiResult(false, "不存在此图书!");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -189,7 +189,7 @@ public class LibraryManagementSystemImpl implements LibraryManagementSystem {
             stmt.setInt(1, bookId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return new ApiResult(false, "Cannot remove book because it is borrowed!");
+                return new ApiResult(false, "图书尚未归还!");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -220,7 +220,7 @@ public class LibraryManagementSystemImpl implements LibraryManagementSystem {
             stmt.setInt(1, book.getBookId());
             ResultSet rs = stmt.executeQuery();
             if (!rs.next()) {
-                return new ApiResult(false, "Book does not exist!");
+                return new ApiResult(false, "图书不存在!");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -368,7 +368,7 @@ public class LibraryManagementSystemImpl implements LibraryManagementSystem {
                 stmt.setInt(1, borrow.getBookId());
                 ResultSet rs = stmt.executeQuery();
                 if (!rs.next()) {
-                    return new ApiResult(false, "Book does not exist!");
+                    return new ApiResult(false, "不存在此书！");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -381,7 +381,7 @@ public class LibraryManagementSystemImpl implements LibraryManagementSystem {
                 stmt.setInt(1, borrow.getCardId());
                 ResultSet rs = stmt.executeQuery();
                 if (!rs.next()) {
-                    return new ApiResult(false, "Card does not exist!");
+                    return new ApiResult(false, "不存在此借书证！");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -396,7 +396,7 @@ public class LibraryManagementSystemImpl implements LibraryManagementSystem {
                 if (rs.next()) {
                     int stock = rs.getInt(1);
                     if (stock <= 0) {
-                        return new ApiResult(false, "Book stock is empty!");
+                        return new ApiResult(false, "图书库存不足！");
                     }
                 }
             } catch (Exception e) {
@@ -411,7 +411,7 @@ public class LibraryManagementSystemImpl implements LibraryManagementSystem {
                 stmt.setInt(2, borrow.getCardId());
                 ResultSet rs = stmt.executeQuery();
                 if (rs.next()) {
-                    return new ApiResult(false, "You have already borrowed this book!");
+                    return new ApiResult(false, "您已借阅过此书但未归还!");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -431,7 +431,7 @@ public class LibraryManagementSystemImpl implements LibraryManagementSystem {
                 stmt.executeUpdate();
 
                 commit(conn);
-                return new ApiResult(true, "Successfully borrowed book!");
+                return new ApiResult(true, "借书成功");
             } catch (Exception e) {
                 rollback(conn);
                 e.printStackTrace();
@@ -444,6 +444,32 @@ public class LibraryManagementSystemImpl implements LibraryManagementSystem {
     public ApiResult returnBook(Borrow borrow) {
         Connection conn = connector.getConn();
 
+        // check the validity of book id
+        try {
+            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM book WHERE book_id =?");
+            stmt.setInt(1, borrow.getBookId());
+            ResultSet rs = stmt.executeQuery();
+            if (!rs.next()) {
+                return new ApiResult(false, "不存在此书！");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ApiResult(false, "Database Error:" + e.getMessage());
+        }
+
+        // check the validity of card id
+        try {
+            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM card WHERE card_id =?");
+            stmt.setInt(1, borrow.getCardId());
+            ResultSet rs = stmt.executeQuery();
+            if (!rs.next()) {
+                return new ApiResult(false, "不存在此借书证！");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ApiResult(false, "Database Error:" + e.getMessage());
+        }
+
         // check if the book is borrowed by the user and not yet returned
         try {
             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM borrow WHERE book_id =? AND card_id =? AND return_time = 0");
@@ -451,14 +477,14 @@ public class LibraryManagementSystemImpl implements LibraryManagementSystem {
             stmt.setInt(2, borrow.getCardId());
             ResultSet rs = stmt.executeQuery();
             if (!rs.next()) {
-                return new ApiResult(false, "You have not borrowed this book!");
+                return new ApiResult(false, "您未借阅过此书!");
             }
 
             long borrowTime = rs.getLong(3);
 
             // if return_time <= borrow_time, then fail to return
             if (borrow.getReturnTime() <= borrowTime) {
-                return new ApiResult(false, "Return time must be later than borrow time!");
+                return new ApiResult(false, "还书时间必须晚于借书时间!");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -478,7 +504,7 @@ public class LibraryManagementSystemImpl implements LibraryManagementSystem {
             stmt.executeUpdate();
 
             commit(conn);
-            return new ApiResult(true, "Successfully returned book!");
+            return new ApiResult(true, "成功还书");
         } catch (Exception e) {
             rollback(conn);
             e.printStackTrace();

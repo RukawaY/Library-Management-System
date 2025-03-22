@@ -67,7 +67,7 @@ export default {
         async QueryBorrows() {
             this.tableData = [] // 清空列表
 
-            let response = axios.get('./borrow?type=records&cardId='+this.cardID.toString())
+            let response = axios.get('/borrow?type=records&cardId='+this.cardID.toString())
                .then(response => {
                     if (response.data.error) {
                         ElMessage.error(response.data.error);

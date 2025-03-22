@@ -117,7 +117,7 @@ public class BookHandler implements HttpHandler {
                     tempResult = tempResult.substring(0, tempResult.length() - 2);
                     tempResult += "]";
 
-                    response = "{\"count\":" + results.getCount() + ", \"results\":" + tempResult + "}";
+                    response = "{\"records\":" + tempResult + "}";
                 } else {
                     response = "{\"error\":\"" + res.message + "\"}";
                 }
@@ -151,7 +151,7 @@ public class BookHandler implements HttpHandler {
         }
 
         String request = requestBodyBuilder.toString();
-        String message = "Uninitialized message";
+        String message = "{\"error\": \"Uninitialized message\"}";
         Gson gson = new Gson();
 
         // 处理请求
@@ -162,9 +162,9 @@ public class BookHandler implements HttpHandler {
                 Book book = gson.fromJson(request, BookJson.class).getBook();
                 res = libsys.storeBook(book);
                 if (res.ok) {
-                    message = "Successfully stored book";
+                    message = "{\"success\": \"图书入库成功\"}";
                 } else {
-                    message = "Failed to store book: " + res.message;
+                    message = "{\"error\": \"图书入库失败: " + res.message + "\"}";
                 }
                 break;
             case "incstock":
@@ -172,63 +172,63 @@ public class BookHandler implements HttpHandler {
                 int amount = gson.fromJson(request, BookIDAmtJson.class).getAmount();
                 res = libsys.incBookStock(bookId, amount);
                 if (res.ok) {
-                    message = "Successfully increased stock";
+                    message = "{\"success\": \"修改图书库存成功\"}";
                 } else {
-                    message = "Failed to increase stock: " + res.message;
+                    message = "{\"error\": \"修改图书库存失败: " + res.message + "\"}";
                 }
                 break;
             case "storemulti":
                 List<Book> books = gson.fromJson(request, MultiBookJson.class).getBooks();
                 res = libsys.storeBook(books);
                 if (res.ok) {
-                    message = "Successfully stored books";
+                    message = "{\"success\": \"图书入库成功\"}";
                 } else {
-                    message = "Failed to store books: " + res.message;
+                    message = "{\"error\": \"图书入库失败: " + res.message + "\"}";
                 }
                 break;
             case "remove":
                 int bookid = gson.fromJson(request, BookIDJson.class).getBookID();
                 res = libsys.removeBook(bookid);
                 if (res.ok) {
-                    message = "Successfully removed book";
+                    message = "{\"success\": \"图书删除成功\"}";
                 } else {
-                    message = "Failed to remove book: " + res.message;
+                    message = "{\"error\": \"图书删除失败: " + res.message + "\"}";
                 }
                 break;
             case "modify":
                 Book book2 = gson.fromJson(request, BookJson.class).getBook();
                 res = libsys.modifyBookInfo(book2);
                 if (res.ok) {
-                    message = "Successfully modified book";
+                    message = "{\"success\": \"修改图书信息成功\"}";
                 } else {
-                    message = "Failed to modify book: " + res.message;
+                    message = "{\"error\": \"修改图书信息失败: " + res.message + "\"}";
                 }
                 break;
             case "borrow":
                 Borrow borrow1 = gson.fromJson(request, BorrowJson.class).getBorrow();
                 res = libsys.borrowBook(borrow1);
                 if (res.ok) {
-                    message = "Successfully borrowed book";
+                    message = "{\"success\": \"借书成功\"}";
                 } else {
-                    message = "Failed to borrow book: " + res.message;
+                    message = "{\"error\": \"借书失败: " + res.message + "\"}";
                 }
                 break;
             case "return":
                 Borrow borrow2 = gson.fromJson(request, BorrowJson.class).getBorrow();
                 res = libsys.returnBook(borrow2);
                 if (res.ok) {
-                    message = "Successfully returned book";
+                    message = "{\"success\": \"还书成功\"}";
                 } else {
-                    message = "Failed to return book: " + res.message;
+                    message = "{\"error\": \"还书失败: " + res.message + "\"}";
                 }
                 break;
             default:
-                message = "Invalid action";
+                message = "{\"error\": \"Invalid action\"}";
                 break;
         }
 
         // 设置响应头
-        exchange.getResponseHeaders().set("Content-Type", "text/plain");
+        exchange.getResponseHeaders().set("Content-Type", "application/json");
         exchange.sendResponseHeaders(200, 0);
 
         OutputStream outputStream = exchange.getResponseBody();
