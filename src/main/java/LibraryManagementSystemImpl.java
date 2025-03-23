@@ -566,7 +566,7 @@ public class LibraryManagementSystemImpl implements LibraryManagementSystem {
             stmt.setString(3, card.getType().getStr());
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return new ApiResult(false, "Card already exists!");
+                return new ApiResult(false, "借书证已经存在!");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -607,7 +607,7 @@ public class LibraryManagementSystemImpl implements LibraryManagementSystem {
             stmt.setInt(1, cardId);
             ResultSet rs = stmt.executeQuery();
             if (!rs.next()) {
-                return new ApiResult(false, "Card does not exist!");
+                return new ApiResult(false, "借书证不存在!");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -620,7 +620,7 @@ public class LibraryManagementSystemImpl implements LibraryManagementSystem {
             stmt.setInt(1, cardId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return new ApiResult(false, "Cannot remove card because it is borrowing a book!");
+                return new ApiResult(false, "当前借书证有未归还图书!");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -680,7 +680,7 @@ public class LibraryManagementSystemImpl implements LibraryManagementSystem {
             stmt.setInt(1, card.getCardId());
             ResultSet rs = stmt.executeQuery();
             if (!rs.next()) {
-                return new ApiResult(false, "Card does not exist!");
+                return new ApiResult(false, "借书证不存在!");
             }
         } catch (Exception e) {
             e.printStackTrace();

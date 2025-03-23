@@ -40,12 +40,7 @@ export default {
     data() {
         return {
             isShow: false, // 结果表格展示状态
-            tableData: [{ // 列表项
-                cardID: 1,
-                bookID: 1,
-                borrowTime: "2024.03.04 21:48",
-                returnTime: "2024.03.04 21:49"
-            }],
+            tableData: [],
             type: '',
             cardID: '', // 待查询内容(对某一借书证号进行查询)
             toSearch: '', // 待搜索内容(对查询到的结果进行搜索)
@@ -64,25 +59,43 @@ export default {
         }
     },
     methods: {
+        reflect(time) {
+            if (time === 0) {
+                return '未归还';
+            }
+
+            // 20250304092613 -> 2025年03月04日 09:26:13
+            let t = time.toString();
+            let year = t.substring(0, 4);
+            let month = t.substring(4, 6);
+            let day = t.substring(6, 8);
+            let hour = t.substring(8, 10);
+            let minute = t.substring(10, 12);
+            let second = t.substring(12, 14);
+            return year + '年' + month + '月' + day + '日 '+ hour + ':' + minute + ':' + second;
+        },
         async QueryBorrows() {
             this.tableData = [] // 清空列表
 
-            let response = axios.get('/borrow?type=records&cardId='+this.cardID.toString())
+            let response = axios.get('/borrow?type=records&cardId='+this.cardID)
                .then(response => {
                     if (response.data.error) {
                         ElMessage.error(response.data.error);
                     } else {
-                        console.log('Borrow records: ', response.data.records);
                         let borrows = response.data.records // 获取响应负载
+                        let tempData;
                         borrows.forEach(borrow => { // 对于每一个借书记录
-                            this.tableData.push(borrow) // 将它加入到列表项中
+                            tempData = {
+                                cardID: borrow.cardID,
+                                bookID: borrow.bookID,
+                                borrowTime: this.reflect(borrow.borrowTime),
+                                returnTime: this.reflect(borrow.returnTime)
+                            }
+                            this.tableData.push(tempData) // 将它加入到列表项中
                         });
                         this.isShow = true // 显示结果列表
                     }
                })
-               .catch(error => {
-                    console.error('Error: ', error);
-               });
         }
     }
 }

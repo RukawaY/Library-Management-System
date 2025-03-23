@@ -108,7 +108,7 @@ public class CardHandler implements HttpHandler {
         }
 
         String request = requestBodyBuilder.toString();
-        String message = "Uninitialized message";
+        String message = "{\"error\": \"Uninitialized message\"";
         Gson gson = new Gson();
 
         // 处理请求：registerCard or removeCard
@@ -126,18 +126,18 @@ public class CardHandler implements HttpHandler {
 
                 res = libsys.registerCard(card);
                 if (res.ok) {
-                    message = "Register card success";
+                    message = "{\"success\":\"注册借书证成功\"}";
                 } else {
-                    message = "Register card failed: " + res.message;
+                    message = "{\"error\":\"注册借书证失败: " + res.message + "\"}";
                 }
                 break;
             case "remove":
                 int cardId3 = gson.fromJson(request, CardIDJson.class).getCardID();
                 res = libsys.removeCard(cardId3);
                 if (res.ok) {
-                    message = "Remove card success";
+                    message = "{\"success\":\"删除借书证成功\"}";
                 } else {
-                    message = "Remove card failed: " + res.message;
+                    message = "{\"error\":\"删除借书证失败: " + res.message + "\"}";
                 }
                 break;
             case "modify":
@@ -150,18 +150,18 @@ public class CardHandler implements HttpHandler {
 
                 res = libsys.modifyCardInfo(card2);
                 if (res.ok) {
-                    message = "Modify card success";
+                    message = "{\"success\":\"修改借书证信息成功\"}";
                 } else {
-                    message = "Modify card failed: " + res.message;
+                    message = "{\"error\":\"修改借书证信息失败: " + res.message + "\"}";
                 }
                 break;
             default:
-                message = "Invalid action";
+                message = "{\"error\":\"无效操作\"}";
                 break;
         }
 
         // 设置响应头
-        exchange.getResponseHeaders().set("Content-Type", "text/plain");
+        exchange.getResponseHeaders().set("Content-Type", "application/json");
         exchange.sendResponseHeaders(200, 0);
 
         OutputStream outputStream = exchange.getResponseBody();

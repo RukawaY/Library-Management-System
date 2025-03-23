@@ -139,18 +139,18 @@
         </el-dialog>
 
         <!-- 查询对话框 -->
-        <el-dialog v-model="queryVisible" title="查询图书" width="30%" align-center>
+        <el-dialog v-model="queryVisible" title="查询图书（至少输入一个查询条件）" width="30%" align-center>
             <div style="margin-left: 2vw; font-weight: bold; font-size: 1rem; margin-top: 20px; ">
                 类别：
-                <el-input v-model="queryInfo.category" style="width: 12.5vw;" clearable />
+                <el-input v-model="queryInfo.category" style="width: 12.5vw;" clearable placeholder="精确查询"/>
             </div>
             <div style="margin-left: 2vw; font-weight: bold; font-size: 1rem; margin-top: 20px; ">
                 书名：
-                <el-input v-model="queryInfo.title" style="width: 12.5vw;" clearable />
+                <el-input v-model="queryInfo.title" style="width: 12.5vw;" clearable  placeholder="模糊查询"/>
             </div>
             <div style="margin-left: 2vw;   font-weight: bold; font-size: 1rem; margin-top: 20px; ">
                 出版社：
-                <el-input v-model="queryInfo.press" style="width: 12.5vw;" clearable />
+                <el-input v-model="queryInfo.press" style="width: 12.5vw;" clearable  placeholder="模糊查询"/>
             </div>
             <div style="margin-left: 2vw;   font-weight: bold; font-size: 1rem; margin-top: 20px; ">
                 最小年份：
@@ -162,7 +162,7 @@
             </div>
             <div style="margin-left: 2vw;   font-weight: bold; font-size: 1rem; margin-top: 20px; ">
                 作者：
-                <el-input v-model="queryInfo.author" style="width: 12.5vw;" clearable />
+                <el-input v-model="queryInfo.author" style="width: 12.5vw;" clearable  placeholder="模糊查询"/>
             </div>
             <div style="margin-left: 2vw;   font-weight: bold; font-size: 1rem; margin-top: 20px; ">
                 最低价格：
@@ -172,12 +172,24 @@
                 最高价格：
                 <el-input v-model="queryInfo.maxPrice" style="width: 12.5vw;" clearable />    
             </div>
+            <div style="margin-left: 2vw;   font-weight: bold; font-size: 1rem; margin-top: 20px; ">
+                排序依据：
+                <el-select v-model="queryInfo.sortby" size="middle" style="width: 12.5vw;" clearable>
+                    <el-option v-for="type in types" :key="type.value" :label="type.label" :value="type.value" />
+                </el-select>
+            </div>
+            <div style="margin-left: 2vw;   font-weight: bold; font-size: 1rem; margin-top: 20px; ">
+                排序方式：
+                <el-select v-model="queryInfo.sortorder" size="middle" style="width: 12.5vw;" clearable>
+                    <el-option v-for="stype in sortTypes" :key="stype.value" :label="stype.label" :value="stype.value"/>
+                </el-select>
+            </div>
 
             <template #footer>
                 <span>
                     <el-button type="danger" @click="queryVisible = false">取消</el-button>
                     <el-button type="primary" @click="ConfirmQuery"
-                        :disabled="queryInfo.category.length === 0 && queryInfo.title.length === 0 && queryInfo.press.length === 0 && queryInfo.minYear.length === 0 && queryInfo.maxYear.length === 0 && queryInfo.author.length === 0 && queryInfo.minPrice.length === 0 && queryInfo.maxPrice.length === 0">确定</el-button>
+                        :disabled="queryInfo.category.length === 0 && queryInfo.title.length === 0 && queryInfo.press.length === 0 && queryInfo.minYear.length === 0 && queryInfo.maxYear.length === 0 && queryInfo.author.length === 0 && queryInfo.minPrice.length === 0 && queryInfo.maxPrice.length === 0 || (queryInfo.sortby === 0 && queryInfo.sortorder != 0) || (queryInfo.sortby != 0 && queryInfo.sortorder === 0)">确定</el-button>
                 </span>
             </template>
         </el-dialog>
@@ -373,8 +385,7 @@
                 <el-button type="primary" @click="ShowQueryResults = false" style="margin-left: 20px;">隐藏</el-button>
             </div>
 
-            <el-table :data="queryResults" height="500"
-                :default-sort="{ prop: 'bookId', order: 'ascending' }" :table-layout="'auto'"
+            <el-table :data="queryResults" height="500" :table-layout="'auto'"
                 style="width: 100%; margin-left: 50px; margin-top: 30px; margin-right: 50px; max-width: 80vw;">
                 <el-table-column prop="bookId" label="书号" />
                 <el-table-column prop="category" label="类别" sortable />
@@ -420,7 +431,9 @@ export default {
                 maxYear: '',
                 author: '',
                 minPrice: '',
-                maxPrice: ''
+                maxPrice: '',
+                sortby: '',
+                sortorder: ''
             },
             queryResults: [], // 查询结果
             ShowQueryResults: false, // 是否显示查询结果
@@ -453,7 +466,20 @@ export default {
                 author: '',
                 price: ''
             },
-            action: '' // 具体操作
+            types: [
+                {value: 'book_id', label: '书号'},
+                {value: 'category', label: '类别'},
+                {value: 'title', label: '书名'},
+                {value: 'press', label: '出版社'},
+                {value: 'publish_year', label: '出版年份'},
+                {value: 'author', label: '作者'},
+                {value: 'price', label: '价格'},
+                {value: 'stock', label: '库存'}
+            ],
+            sortTypes: [
+                {value: 'asc', label: '升序'},
+                {value: 'desc', label: '降序'}
+            ]
         }
     },
     methods: {
@@ -543,10 +569,10 @@ export default {
             if (this.queryInfo.press.length > 0) {
                 query += `&press=${this.queryInfo.press}`
             }
-            if (this.queryInfo.minYear.length > 0) {
+            if (this.queryInfo.minYear) {
                 query += `&min-publish-year=${this.queryInfo.minYear.getFullYear().toString()}`
             }
-            if (this.queryInfo.maxYear.length > 0) {
+            if (this.queryInfo.maxYear) {
                 query += `&max-publish-year=${this.queryInfo.maxYear.getFullYear().toString()}`
             }
             if (this.queryInfo.author.length > 0) {
@@ -558,6 +584,12 @@ export default {
             if (this.queryInfo.maxPrice.length > 0) {
                 query += `&maxprice=${this.queryInfo.maxPrice}`
             }
+            if (this.queryInfo.sortby.length > 0) {
+                query += `&sortby=${this.queryInfo.sortby}`
+            }
+            if (this.queryInfo.sortorder.length > 0) {
+                query += `&sortorder=${this.queryInfo.sortorder}`
+            }
 
             let response = axios.get(query) // 向/card发出GET请求
                 .then(response => {
@@ -565,7 +597,6 @@ export default {
                         ElMessage.error(response.data.error) // 显示错误消息
                     } else {
                         ElMessage.success("查询成功") // 显示消息提醒
-                        console.log(response.data.records)
                         this.queryVisible = false // 将对话框设置为不可见
 
                         let records = response.data.records // 接收响应负载
@@ -583,6 +614,8 @@ export default {
                         this.queryInfo.author = ''
                         this.queryInfo.minPrice = ''
                         this.queryInfo.maxPrice = ''
+                        this.queryInfo.sortby = ''
+                        this.queryInfo.sortorder = ''
                     }
                 });
         },
@@ -631,7 +664,6 @@ export default {
                     stock: book.stock
                 })
             })
-            console.log(book_list)
 
             axios.post("/book", {
                 action: "storemulti",

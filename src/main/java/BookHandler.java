@@ -97,10 +97,10 @@ public class BookHandler implements HttpHandler {
                             conditions.setMaxPrice(Double.parseDouble(KeyValue[1]));
                             break;
                         case "sortby":
-                            conditions.setSortBy(SortColumn.valueOf(KeyValue[1]));
+                            conditions.setSortBy(SortColumn.valueOf(KeyValue[1].toUpperCase()));
                             break;
                         case "sortorder":
-                            conditions.setSortOrder(SortOrder.valueOf(KeyValue[1]));
+                            conditions.setSortOrder(SortOrder.valueOf(KeyValue[1].toUpperCase()));
                             break;
                         }
                 }
