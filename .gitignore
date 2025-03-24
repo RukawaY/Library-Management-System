@@ -2,6 +2,6 @@
 .vs/
 .vscode/
 target/
-front-end/.idea
-front-end/node_modules/
+librarymanagementsystem-frontend/.idea
+librarymanagementsystem-frontend/node_modules/
 .DS_Store
